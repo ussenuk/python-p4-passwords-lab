@@ -30,7 +30,8 @@ class Signup(Resource):
 class CheckSession(Resource):
     def get(self):
         if 'user_id' in session and session['user_id'] is not None:
-            user = db.session.get(User, session['user_id'])
+            # user = db.session.get(User, session['user_id'])
+            user = User.query.filter(User.id==session.get('user_id')).first()
             if user:
                 return make_response(user.to_dict(), 200)
         return make_response({}, 204)
@@ -45,13 +46,12 @@ class Login(Resource):
 
         if user.authenticate(password):
             session['user_id']=user.id
-            # session['username']=username
             return user.to_dict(), 200
         return {'error': 'Invalid username or password'}, 401
 
 class Logout(Resource):
     def delete(self):
-        # session['username'] = None
+
         session['user_id'] = None
         return {'message': 'User successfully logout'}, 200
 
